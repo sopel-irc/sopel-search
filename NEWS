@@ -1,5 +1,14 @@
 ## Changelog
 
-### 0.1.0
+### 1.0.0
 
 First release of `sopel-search`.
+
+This new search plugin apes a lot of behaviors from Sopel's built-in `search`,
+with the following notable changes:
+
+* `.bing` is no longer available
+* `.search` is an alias to `.ddg`, as `.g` was already
+* Search `region` and `safesearch` level are now configurable
+* `.suggest` uses DuckDuckGo; Google suggestions are still available via the
+  new `.gsuggest` command (if optional extra dependencies are installed)
