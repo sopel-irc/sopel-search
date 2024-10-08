@@ -1,5 +1,10 @@
 ## Changelog
 
+### 1.0.1
+
+Bump DuckDuckGo library minimum version; older releases stopped working.
+
+
 ### 1.0.0
 
 First release of `sopel-search`.
