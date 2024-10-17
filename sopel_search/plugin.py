@@ -23,7 +23,7 @@ PLUGIN_OUTPUT_PREFIX = '[search] '
 
 def setup(bot):
     bot.settings.define_section('search', SearchSection)
-    bot.memory['ddg_search_client'] = DDGS()
+    refresh_ddgs_client(bot)
 
 
 def shutdown(bot):
@@ -32,6 +32,15 @@ def shutdown(bot):
 
 def configure(config):
     configure_plugin(config)
+
+
+# recreate the DDGS client hourly to avoid excess `RatelimitException`s
+# it seems to get stale after a while, probably longer than an hour but
+# it's not that expensive to recreate the client more often
+@plugin.interval(60 * 60)
+def refresh_ddgs_client(bot):
+    bot.memory['ddg_search_client'] = DDGS()
+    LOGGER.debug('Refreshed DuckDuckGo search client.')
 
 
 @plugin.commands('search', 'ddg', 'g')
