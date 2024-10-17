@@ -11,11 +11,13 @@ https://sopel.chat
 from __future__ import annotations
 
 from duckduckgo_search import DDGS
-from sopel import plugin
+from duckduckgo_search.exceptions import RatelimitException, TimeoutException
+from sopel import plugin, tools
 
 from .config import configure_plugin, SearchSection
 
 
+LOGGER = tools.get_logger('search')
 PLUGIN_OUTPUT_PREFIX = '[search] '
 
 
@@ -44,13 +46,30 @@ def search(bot, trigger):
         return plugin.NOLIMIT
 
     query = trigger.group(2)
-    results = bot.memory['ddg_search_client'].text(
-        keywords=query,
-        region=bot.settings.search.region,
-        safesearch=bot.settings.search.safesearch,
-        backend='api',
-        max_results=1,
-    )
+
+    try:
+        results = bot.memory['ddg_search_client'].text(
+            keywords=query,
+            region=bot.settings.search.region,
+            safesearch=bot.settings.search.safesearch,
+            backend='api',
+            max_results=1,
+        )
+    except RatelimitException:
+        bot.reply(
+            "Sorry, I can't search right now. If this error persists, ask {} "
+            "to check my logs.".format(bot.settings.core.owner)
+        )
+        LOGGER.error(
+            "Rate limit error from DuckDuckGo. If this problem persists, try "
+            "`pip install --upgrade duckduckgo-search` to see if there is a "
+            "newer version, and restart the bot if so."
+        )
+        return
+    except TimeoutException:
+        bot.reply("Sorry, the search request timed out. Try again later.")
+        LOGGER.error("Timeout during search request.")
+        return
 
     if not results:
         bot.reply("Sorry, no results found for '{}'.".format(query))
