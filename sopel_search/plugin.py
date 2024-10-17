@@ -74,10 +74,16 @@ def search(bot, trigger):
             "`pip install --upgrade duckduckgo-search` to see if there is a "
             "newer version, and restart the bot if so."
         )
+        LOGGER.debug(
+            "Refreshing DDGS client to try to recover from RatelimitException.")
+        refresh_ddgs_client(bot)
         return
     except TimeoutException:
         bot.reply("Sorry, the search request timed out. Try again later.")
         LOGGER.error("Timeout during search request.")
+        LOGGER.debug(
+            "Refreshing DDGS client to try to recover from TimeoutException.")
+        refresh_ddgs_client(bot)
         return
 
     if not results:
