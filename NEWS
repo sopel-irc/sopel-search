@@ -1,5 +1,14 @@
 ## Changelog
 
+### 1.1.0
+
+* Handle common errors with some amount of grace ([#4][])
+* Refresh the DDGS client periodically to reduce errors ([#5][])
+
+[#4]: https://github.com/sopel-irc/sopel-search/pull/4
+[#5]: https://github.com/sopel-irc/sopel-search/pull/5
+
+
 ### 1.0.1
 
 Bump DuckDuckGo library minimum version; older releases stopped working.
