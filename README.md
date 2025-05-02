@@ -10,6 +10,9 @@ Releases are hosted on PyPI, so after installing Sopel, all you need is `pip`:
 $ pip install sopel-search
 ```
 
+This plugin is designed for use with Sopel version 8.0+, but may have a higher
+minimum Python version requirement than Sopel itself.
+
 ### Google query suggestions
 
 If you want users to be able to fetch query suggestions from Google using the
