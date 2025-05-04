@@ -1,5 +1,15 @@
 ## Changelog
 
+### 1.2.0
+
+* Upgrade DDGS library from 6.x to 8.x ([#6][])
+  * **This also required raising the minimum Python version to 3.9**
+* Update package metadata for PEP 639 ([#7][])
+
+[#6]: https://github.com/sopel-irc/sopel-search/pull/6
+[#7]: https://github.com/sopel-irc/sopel-search/pull/7
+
+
 ### 1.1.0
 
 * Handle common errors with some amount of grace ([#4][])
