@@ -39,10 +39,10 @@ keywords = [
   "irc",
 ]
 
-requires-python = ">=3.8, <4"
+requires-python = ">=3.9, <4"  # Python 3.9+ only as of duckduckgo-search 7.3
 dependencies = [
   "sopel>=8.0",
-  "duckduckgo-search~=6.3",
+  "duckduckgo-search>=8.0",
 ]
 
 [project.optional-dependencies]

@@ -61,7 +61,7 @@ def search(bot, trigger):
             keywords=query,
             region=bot.settings.search.region,
             safesearch=bot.settings.search.safesearch,
-            backend='api',
+            backend='auto',
             max_results=1,
         )
     except RatelimitException:
