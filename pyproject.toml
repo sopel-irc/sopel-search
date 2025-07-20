@@ -38,15 +38,14 @@ keywords = [
   "irc",
 ]
 
-requires-python = ">=3.9, <4"  # Python 3.9+ only as of duckduckgo-search 7.3
+requires-python = ">=3.9, <4"  # Python 3.9+ only as of ddgs 7.3
 dependencies = [
   "sopel>=8.0",
-  "duckduckgo-search>=8.0",
+  "ddgs>=9.0",
+  # for .suggest
+  "xmltodict~=0.13.0",
+  "requests",  # let Sopel define the version constraint
 ]
-
-[project.optional-dependencies]
-gsuggest = ["xmltodict~=0.13.0", "requests"]
-# Sopel itself requires `requests`, but it's best to be explicit
 
 [project.urls]
 "Homepage" = "https://github.com/sopel-irc/sopel-search"

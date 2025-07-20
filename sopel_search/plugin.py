@@ -10,9 +10,11 @@ https://sopel.chat
 """
 from __future__ import annotations
 
-from duckduckgo_search import DDGS
-from duckduckgo_search.exceptions import RatelimitException, TimeoutException
+from ddgs import DDGS
+from ddgs.exceptions import RatelimitException, TimeoutException
+import requests
 from sopel import plugin, tools
+import xmltodict
 
 from .config import configure_plugin, SearchSection
 
@@ -58,7 +60,7 @@ def search(bot, trigger):
 
     try:
         results = bot.memory['ddg_search_client'].text(
-            keywords=query,
+            query=query,
             region=bot.settings.search.region,
             safesearch=bot.settings.search.safesearch,
             backend='auto',
@@ -70,9 +72,9 @@ def search(bot, trigger):
             "to check my logs.".format(bot.settings.core.owner)
         )
         LOGGER.error(
-            "Rate limit error from DuckDuckGo. If this problem persists, try "
-            "`pip install --upgrade duckduckgo-search` to see if there is a "
-            "newer version, and restart the bot if so."
+            "Rate limit error. If this problem persists, try `pip install "
+            "--upgrade ddgs` to see if there is a newer version, and restart "
+            "the bot if so."
         )
         LOGGER.debug(
             "Refreshing DDGS client to try to recover from RatelimitException.")
@@ -99,34 +101,9 @@ def search(bot, trigger):
     )
 
 
-@plugin.command('suggest')
-@plugin.output_prefix(PLUGIN_OUTPUT_PREFIX)
-def suggest(bot, trigger):
-    """Suggest search phrases based on the given input."""
-    if not trigger.group(2):
-        bot.reply('{}suggest what?'.format(bot.settings.core.help_prefix))
-        return plugin.NOLIMIT
-
-    query = trigger.group(2)
-    results = bot.memory['ddg_search_client'].suggestions(
-        query,
-        region=bot.settings.search.region,
-    )
-    try:
-        top_three = ["'" + d['phrase'] + "'" for d in results[0:3]]
-    except (IndexError, KeyError):
-        bot.reply(
-            "Sorry, I couldn't get any suggestions for '{}'."
-            .format(query)
-        )
-        return plugin.NOLIMIT
-
-    bot.say(', '.join(top_three[0:-2]) + ' and ' + top_three[-1])
-
-
 """
-`.gsuggest` command code below is lightly modified from Sopel's old built-in
-`search.py` plugin, whose copyright notice is retained here:
+`.gsuggest` command code below is based on Sopel's old built-in `search.py`
+plugin, whose copyright notice is retained here.
 
 search.py - Sopel Search Engine Plugin
 Copyright 2008-9, Sean B. Palmer, inamidst.com
@@ -137,54 +114,47 @@ https://sopel.chat
 """
 
 
-@plugin.command('gsuggest')
+@plugin.command('suggest', 'gsuggest')
 @plugin.example('.gsuggest', '.gsuggest what?')
 @plugin.output_prefix(PLUGIN_OUTPUT_PREFIX)
 def gsuggest(bot, trigger):
-    """Get search query autocomplete from Google."""
-    # It's true that using Google isn't necessarily ideal, but this is an
-    # optional feature. Those who care about privacy can and should use the
-    # DuckDuckGo-based `.suggest` command instead.
-    try:
-        import requests
-        import xmltodict
-    except ImportError:
-        bot.reply(
-            'At least one {}gsuggest command dependency is missing. Ask my '
-            'owner to see the `sopel-search` plugin README for details.'
-            .format(bot.settings.core.help_prefix))
-        return plugin.NOLIMIT
-
+    """Get search query autocomplete suggestions from Google."""
+    # It's true that using Google isn't necessarily ideal, but DDGS removed
+    # support for suggestions in its 7.x release series.
     if not trigger.group(2):
         bot.reply('{}gsuggest what?'.format(bot.settings.core.help_prefix))
         return
 
     query = trigger.group(2)
+    language = bot.settings.search.region.partition('-')[1] or 'en'
 
     base = 'https://suggestqueries.google.com/complete/search'
     parameters = {
         'output': 'toolbar',
-        'hl': 'en',
+        'hl': language,
         'q': query,
     }
 
     response = requests.get(base, parameters)
-    answer = xmltodict.parse(response.text)['toplevel']
 
     try:
-        answer = answer['CompleteSuggestion']
-
-        try:
-            answer = answer[0]
-        except KeyError:
-            # only one suggestion; don't need to extract first item
-            pass
-
-        answer = answer['suggestion']['@data']
+        answers = xmltodict.parse(response.text)['toplevel']['CompleteSuggestion']
     except TypeError:
-        answer = None
+        # empty suggestion list returns `{'toplevel': None}`, which will raise
+        # `TypeError` when trying to access nonexistent `CompleteSuggestion` key
+        answers = []
 
-    if answer:
-        bot.say(answer)
+    if not isinstance(answers, list):
+        # a single suggestion is returned as just a dict; wrap it in a list
+        answers = [answers]
+
+    answers = [f"'{answer['suggestion']['@data']}'" for answer in answers]
+    top_three = answers[:3]
+
+    if answers:
+        start = ', '.join(top_three[:-1])
+        if start:
+            start += ' and '
+        bot.say(start + top_three[-1])
     else:
         bot.reply('Sorry, no result.')
