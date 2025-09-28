@@ -31,5 +31,5 @@ which it prompts you. Available settings are:
 
 Two primary functions are available, `search` and `suggest`:
 
-* `.search` (or `.g`): Perform a text search and return the top result
+* `.search` (aliases: `.ddg`, `.g`): Perform a text search and return the top result
 * `.suggest`: Fetch autocomplete suggestions for the stem of a search query
