@@ -63,7 +63,7 @@ def search(bot, trigger):
             query=query,
             region=bot.settings.search.region,
             safesearch=bot.settings.search.safesearch,
-            backend='auto',
+            backend='duckduckgo, google, brave, bing',
             max_results=1,
         )
     except RatelimitException:
