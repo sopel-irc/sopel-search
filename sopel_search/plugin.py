@@ -126,7 +126,7 @@ def gsuggest(bot, trigger):
         return
 
     query = trigger.group(2)
-    language = bot.settings.search.region.partition('-')[1] or 'en'
+    language = (bot.settings.search.region.partition('-')[1] or 'en').lower()
 
     base = 'https://suggestqueries.google.com/complete/search'
     parameters = {
