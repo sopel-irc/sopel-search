@@ -11,16 +11,7 @@ $ pip install sopel-search
 ```
 
 This plugin is designed for use with Sopel version 8.0+, but may have a higher
-minimum Python version requirement than Sopel itself.
-
-### Google query suggestions
-
-If you want users to be able to fetch query suggestions from Google using the
-`.gsuggest` command, you will need the `gsuggest` extra:
-
-```shell
-$ pip install sopel-search[gsuggest]
-```
+minimum Python version requirement than Sopel itself due to upstream libraries.
 
 ## Configuring
 
@@ -35,3 +26,10 @@ which it prompts you. Available settings are:
   query suggestions using `.suggest`.
 * `safesearch`: Controls SafeSearch filtering of `.search` results; one of 'on',
   'moderate', and 'off'.
+
+## Using
+
+Two primary functions are available, `search` and `suggest`:
+
+* `.search` (aliases: `.ddg`, `.g`): Perform a text search and return the top result
+* `.suggest`: Fetch autocomplete suggestions for the stem of a search query
