@@ -1,5 +1,15 @@
 ## Changelog
 
+### 1.3.0
+
+* Migrate DDGS library from 8.x to 9.x ([#9][])
+  * **Includes package name change to `ddgs`; the older `duckduckgo_search`
+    package is no longer used nor updated.**
+* Fixed `.suggest` and merged it with `.gsuggest` ([#9][])
+
+[#9]: https://github.com/sopel-irc/sopel-search/pull/9
+
+
 ### 1.2.0
 
 * Upgrade DDGS library from 6.x to 8.x ([#6][])
